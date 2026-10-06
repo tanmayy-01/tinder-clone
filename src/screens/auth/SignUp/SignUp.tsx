@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { styles } from './SignUp.styles';
-import { Button, GoogleIcon, MailIcon } from '@/components';
+import { AppImage, Button, GoogleIcon, MailIcon } from '@/components';
 import { SCREEN_NAMES } from '@/constants';
 import { navigate } from '@/utils';
-import { IMAGES } from '@/constants/images';
+import { IMAGES } from '@/constants';
 
 export const SignUp = () => {
   const handleContinueWithEmail = () => {
@@ -22,7 +16,10 @@ export const SignUp = () => {
   };
 
   const handleTroubleSigningIn = () => {
-    Alert.alert('Trouble Signing In?', 'Please check your account recovery options.');
+    Alert.alert(
+      'Trouble Signing In?',
+      'Please check your account recovery options.',
+    );
   };
 
   const handleTermsPress = () => {
@@ -40,7 +37,7 @@ export const SignUp = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
+        <AppImage
           source={IMAGES.TINDER_TEXT_LOGO}
           style={styles.logo}
           resizeMode="contain"

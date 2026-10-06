@@ -1,16 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StatusBar,
-  Animated,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, Animated, TouchableOpacity } from 'react-native';
 import { styles } from './Splash.styles';
-import { SCREEN_NAMES, THEME } from '@/constants';
+import { SCREEN_NAMES } from '@/constants';
 import { replace } from '@/utils';
 import { IMAGES } from '@/constants/images';
+import { AppImage } from '@/components';
 
 export const Splash = () => {
   const scaleAnim = useRef(new Animated.Value(0.85)).current;
@@ -54,7 +48,7 @@ export const Splash = () => {
             opacity: opacityAnim,
           }}
         >
-          <Image
+          <AppImage
             source={IMAGES.SPLASH_LOGO}
             style={styles.logo}
             resizeMode="contain"

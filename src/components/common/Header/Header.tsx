@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { BackArrowIcon } from '../Icon';
 import { scale } from '@/lib/size';
 import { goBack } from '@/utils';
 import { HeaderProps } from '@/types';
+import { COLORS } from '@/constants/colors';
+import { ICON_NAMES } from '@/constants/iconNames';
+import { IconProvider } from '@/lib/icon';
 
 export const Header: React.FC<HeaderProps> = ({
   onBackPress,
@@ -30,7 +32,11 @@ export const Header: React.FC<HeaderProps> = ({
         accessibilityLabel="Go back"
         accessibilityRole="button"
       >
-        <BackArrowIcon size={scale.ms(26)} />
+        <IconProvider
+          name={ICON_NAMES.BACK_ARROW}
+          size={scale.ms(26)}
+          color={COLORS.textDark}
+        />
       </TouchableOpacity>
     </View>
   );

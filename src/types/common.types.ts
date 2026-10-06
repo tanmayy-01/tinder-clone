@@ -1,4 +1,4 @@
-import { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import { ImageProps, ImageStyle, StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 
 export type ButtonVariant = 'primary' | 'social' | 'outline';
 
@@ -32,3 +32,7 @@ export interface UnderlineInputProps extends TextInputProps {
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
 }
+
+export interface AppImageProps extends Omit<ImageProps, 'style'> {
+  style?: StyleProp<ImageStyle>;
+}   

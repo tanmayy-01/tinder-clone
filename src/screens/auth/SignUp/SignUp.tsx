@@ -1,12 +1,96 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { styles } from './SignUp.styles';
+import { Button, GoogleIcon, MailIcon } from '@/components';
+import { SCREEN_NAMES } from '@/constants';
+import { navigate } from '@/utils';
+import { IMAGES } from '@/constants/images';
 
-const SignUp = () => {
+export const SignUp = () => {
+  const handleContinueWithEmail = () => {
+    navigate(SCREEN_NAMES.EMAIL);
+  };
+
+  const handleContinueWithGoogle = () => {
+    Alert.alert('Google Sign-In', 'Google sign-in pressed.');
+  };
+
+  const handleTroubleSigningIn = () => {
+    Alert.alert('Trouble Signing In?', 'Please check your account recovery options.');
+  };
+
+  const handleTermsPress = () => {
+    Alert.alert('Terms', 'Tinder Terms of Service.');
+  };
+
+  const handlePrivacyPress = () => {
+    Alert.alert('Privacy Policy', 'Tinder Privacy Policy.');
+  };
+
+  const handleCookiesPress = () => {
+    Alert.alert('Cookies Policy', 'Tinder Cookies Policy.');
+  };
+
   return (
-    <View>
-      <Text>SignUp</Text>
-    </View>
-  )
-}
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image
+          source={IMAGES.TINDER_TEXT_LOGO}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
 
-export default SignUp
+      <View style={styles.bottomSection}>
+        <Text style={styles.disclaimerText}>
+          By tapping 'Continue' you agree to our{' '}
+          <Text style={styles.underlinedLink} onPress={handleTermsPress}>
+            Terms
+          </Text>
+          . Learn how we process your data in our{' '}
+          <Text style={styles.underlinedLink} onPress={handlePrivacyPress}>
+            Privacy Policy
+          </Text>{' '}
+          and{' '}
+          <Text style={styles.underlinedLink} onPress={handleCookiesPress}>
+            Cookies Policy
+          </Text>
+          .
+        </Text>
+
+        <View style={styles.buttonsContainer}>
+          <Button
+            title="Continue with Google"
+            variant="social"
+            leftIcon={<GoogleIcon />}
+            onPress={handleContinueWithGoogle}
+            style={styles.socialButton}
+          />
+          <Button
+            title="Continue with Email"
+            variant="social"
+            leftIcon={<MailIcon />}
+            onPress={handleContinueWithEmail}
+            style={styles.socialButton}
+          />
+        </View>
+
+        <TouchableOpacity
+          onPress={handleTroubleSigningIn}
+          style={styles.troubleTextContainer}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.troubleText}>Trouble signing in?</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export default SignUp;

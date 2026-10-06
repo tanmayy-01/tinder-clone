@@ -1,8 +1,7 @@
 export const SCREEN_NAMES = {
-
-    //auth
-    LOGIN: 'Login',
-    SIGNUP: 'SignUp',
-
-    //TODO: Add screen names here
+  SPLASH: 'Splash',
+  LOGIN: 'Login',
+  SIGNUP: 'SignUp',
+  EMAIL: 'Email',
 } as const;
+

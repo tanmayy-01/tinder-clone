@@ -1,4 +1,16 @@
-export const CALENDAR_COLORS = {
+export const COLORS = {
+  tinderRed: '#E92742',
+  backgroundLight: '#F4F4F6',
   white: '#FFFFFF',
   black: '#000000',
+  textDark: '#111418',
+  textSubtle: '#6E6E73',
+  textMuted: '#8E8E93',
+  borderLine: '#CCCCCC',
+  borderFocused: '#111418',
+  buttonBlack: '#111111',
+  buttonDisabled: '#DCDCE0',
+  buttonDisabledText: '#9999A0',
+  linkBlue: '#2575FC',
+  transparent: 'transparent',
 } as const;

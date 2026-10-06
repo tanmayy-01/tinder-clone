@@ -3,6 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SCREEN_NAMES } from '@/constants';
 import SignUp from '@/screens/auth/SignUp/SignUp';
 import Login from '@/screens/auth/Login/Login';
+import Email from '@/screens/auth/Email';
+import Splash from '@/screens/splash';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -11,7 +14,7 @@ interface AppNavigationProps {
 }
 
 const AppNavigation: React.FC<AppNavigationProps> = ({
-  initialRoute = SCREEN_NAMES.LOGIN,
+  initialRoute = SCREEN_NAMES.SPLASH,
 }) => {
   return (
     <Stack.Navigator
@@ -19,10 +22,13 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
+        animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen name={SCREEN_NAMES.LOGIN} component={Login} />
+      <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
       <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={SignUp} />
+      <Stack.Screen name={SCREEN_NAMES.LOGIN} component={Login} />
+      <Stack.Screen name={SCREEN_NAMES.EMAIL} component={Email} />
     </Stack.Navigator>
   );
 };

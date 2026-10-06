@@ -1,0 +1,2 @@
+export { default, UnderlineInput } from './UnderlineInput';
+export type { UnderlineInputProps } from './UnderlineInput';

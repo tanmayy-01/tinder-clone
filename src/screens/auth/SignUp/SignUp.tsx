@@ -11,6 +11,10 @@ export const SignUp = () => {
     navigate(SCREEN_NAMES.EMAIL);
   };
 
+  const handleGoToLogin = () => {
+    navigate(SCREEN_NAMES.LOGIN);
+  };
+
   const handleContinueWithGoogle = () => {
     Alert.alert('Google Sign-In', 'Google sign-in pressed.');
   };
@@ -77,6 +81,15 @@ export const SignUp = () => {
             style={styles.socialButton}
           />
         </View>
+
+        <TouchableOpacity
+          onPress={handleGoToLogin}
+          style={styles.loginRow}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.loginPromptText}>Already registered? </Text>
+          <Text style={styles.loginLinkText}>Log in</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleTroubleSigningIn}

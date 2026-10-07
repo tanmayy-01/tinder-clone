@@ -13,19 +13,24 @@ export const AppIcon: React.FC<AppIconProps> = ({
 };
 
 
-export const GoogleIcon = ({ size = 24, color = COLORS.textDark }) => {
+interface IconHelperProps {
+  size?: number;
+  color?: string;
+}
+
+export const GoogleIcon: React.FC<IconHelperProps> = ({ size = 24, color = COLORS.textDark }) => {
   return <AppIcon name={ICON_NAMES.GOOGLE} size={size} color={color} />;
 };
 
-export const PhoneIcon = ({ size = 24, color = COLORS.textDark }) => {
+export const PhoneIcon: React.FC<IconHelperProps> = ({ size = 24, color = COLORS.textDark }) => {
   return <AppIcon name={ICON_NAMES.MOBILE} size={size} color={color} />;
 };
 
-export const MailIcon = ({ size = 24, color = COLORS.textDark }) => {
+export const MailIcon: React.FC<IconHelperProps> = ({ size = 24, color = COLORS.textDark }) => {
   return <AppIcon name={ICON_NAMES.MAIL_OUTLINE} size={size} color={color} />;
 };
 
-export const ChevronDownIcon = ({ size = 14, color = COLORS.textSubtle }) => {
+export const ChevronDownIcon: React.FC<IconHelperProps> = ({ size = 14, color = COLORS.textSubtle }) => {
   return <AppIcon name={ICON_NAMES.CHEVRON_DOWN} size={size} color={color} />;
 };
 

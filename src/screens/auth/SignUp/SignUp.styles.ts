@@ -46,13 +46,31 @@ export const styles = StyleSheet.create({
     borderRadius: scale.ms(25),
   },
   troubleTextContainer: {
-    marginTop: scale.h(22),
+    marginTop: scale.h(10),
     paddingVertical: scale.h(6),
   },
   troubleText: {
     color: COLORS.white,
-    fontSize: scale.ms(15),
+    fontSize: scale.ms(14),
     fontWeight: FONT_WEIGHTS.bold,
     textAlign: 'center',
+  },
+  loginRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: scale.h(18),
+    paddingVertical: scale.h(4),
+  },
+  loginPromptText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: scale.ms(14),
+    fontWeight: FONT_WEIGHTS.medium,
+  },
+  loginLinkText: {
+    color: COLORS.white,
+    fontSize: scale.ms(14),
+    fontWeight: FONT_WEIGHTS.bold,
+    textDecorationLine: 'underline',
   },
 });

@@ -1,4 +1,8 @@
-import { getAuth, createUserWithEmailAndPassword } from '@react-native-firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp } from '@react-native-firebase/firestore';
 
 export interface SignUpData {
@@ -12,7 +16,7 @@ export interface SignUpData {
 }
 
 /**
- * Sign up a user with email and password and store user profile data in Firestore.
+ * Sign up a user with email and password
  */
 export const signUpWithEmail = async (data: SignUpData) => {
   const { email, password, phoneNumber, dob, age, gender } = data;
@@ -20,7 +24,7 @@ export const signUpWithEmail = async (data: SignUpData) => {
   const auth = getAuth();
   const db = getFirestore();
 
-  // 1. Create user in Firebase Authentication
+  // 1. Create user
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email.trim(),
@@ -29,7 +33,7 @@ export const signUpWithEmail = async (data: SignUpData) => {
 
   const uid = userCredential.user.uid;
 
-  // 2. Store user data in Firestore 'users' collection/table
+  // 2. Store user data in 'users' collection
   const userRef = doc(db, 'users', uid);
   await setDoc(userRef, {
     uid,
@@ -38,8 +42,8 @@ export const signUpWithEmail = async (data: SignUpData) => {
     dob,
     age,
     gender,
-    city: '', // Placeholder for city, can be updated later
-    images: [], // Column for multiple images to be added in next step
+    city: '', 
+    images: [],
     createdAt: serverTimestamp(),
   });
 
@@ -53,7 +57,7 @@ export interface UpdateUserData {
 }
 
 /**
- * Update user table/document in Firestore with images and city.
+ * Update user profile with images and city.
  */
 export const updateUserProfile = async ({ uid, images, city }: UpdateUserData) => {
   const db = getFirestore();
@@ -73,4 +77,18 @@ export const updateUserProfile = async ({ uid, images, city }: UpdateUserData) =
 export const getCurrentUser = () => {
   return getAuth().currentUser;
 };
+
+/**
+ * Sign in user with email and password
+ */
+export const signInWithEmail = async (email: string, password: string) => {
+  const auth = getAuth();
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email.trim(),
+    password,
+  );
+  return userCredential.user;
+};
+
 

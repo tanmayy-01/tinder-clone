@@ -24,4 +24,5 @@ export const COLORS = {
   cardBorder: '#CBD5E1',
   cardFilledBackground: '#F8FAFC',
   cardFilledBorder: '#E2E8F0',
+  promptText: 'rgba(255, 255, 255, 0.85)',
 } as const;

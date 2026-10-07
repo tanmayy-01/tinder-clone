@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { styles } from './SignUp.styles';
 import { AppImage, Button, GoogleIcon, MailIcon } from '@/components';
 import { SCREEN_NAMES } from '@/constants';

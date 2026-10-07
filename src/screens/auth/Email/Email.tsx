@@ -3,9 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  StatusBar,
   KeyboardAvoidingView,
-  Platform,
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
@@ -17,38 +15,27 @@ import {
 } from 'react-native';
 import { styles } from './Email.styles';
 import { Header, UnderlineInput, Button, AppIcon } from '@/components';
-import { COLORS, SCREEN_NAMES, THEME } from '@/constants';
-import { goBack, isIOS, resetAndNavigate } from '@/utils';
-
-type Step = 'email' | 'phone' | 'password' | 'dob';
-
-interface CountryOption {
-  code: string;
-  dialCode: string;
-  name: string;
-}
-
-const COUNTRIES: CountryOption[] = [
-  { code: 'IN', dialCode: '+91', name: 'India' },
-  { code: 'US', dialCode: '+1', name: 'United States' },
-  { code: 'GB', dialCode: '+44', name: 'United Kingdom' },
-  { code: 'CA', dialCode: '+1', name: 'Canada' },
-  { code: 'AU', dialCode: '+61', name: 'Australia' },
-  { code: 'DE', dialCode: '+49', name: 'Germany' },
-  { code: 'FR', dialCode: '+33', name: 'France' },
-  { code: 'AE', dialCode: '+971', name: 'United Arab Emirates' },
-];
+import {
+  AGE,
+  COLORS,
+  COUNTRIES,
+  DOB_FIELDS,
+  ICON_NAMES,
+  SCREEN_NAMES,
+  SIGNUP_STEPS,
+} from '@/constants';
+import { goBack, isIOS, isValidEmail, resetAndNavigate } from '@/utils';
+import { CountryOption, Step } from '@/types';
 
 export const Email = () => {
-  // Step state: handles email -> phone -> password -> dob conditionally in this one screen
-  const [currentStep, setCurrentStep] = useState<Step>('email');
-
-  // Animation for smooth step transitions
+  const [currentStep, setCurrentStep] = useState<Step>(SIGNUP_STEPS.EMAIL);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   // Form states
   const [email, setEmail] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState<CountryOption>(COUNTRIES[0]);
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption>(
+    COUNTRIES[0],
+  );
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
@@ -57,7 +44,9 @@ export const Email = () => {
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
-  const [focusedDobField, setFocusedDobField] = useState<'day' | 'month' | 'year' | null>('day');
+  const [focusedDobField, setFocusedDobField] = useState<
+    (typeof DOB_FIELDS)[keyof typeof DOB_FIELDS] | null
+  >(DOB_FIELDS.DAY);
 
   // Country modal
   const [isCountryModalVisible, setIsCountryModalVisible] = useState(false);
@@ -67,7 +56,6 @@ export const Email = () => {
   const yearRef = useRef<any>(null);
   const dayRef = useRef<any>(null);
 
-  // Step transition animation
   const transitionToStep = (nextStep: Step) => {
     Keyboard.dismiss();
     Animated.sequence([
@@ -85,24 +73,17 @@ export const Email = () => {
     setCurrentStep(nextStep);
   };
 
-  // Step 1: Email Validation
-  const isValidEmail = (val: string) => {
-    const trimmed = val.trim();
-    return trimmed.length > 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-  };
   const isEmailValid = isValidEmail(email);
 
-  // Step 2: Phone Validation
   const cleanDigits = phoneNumber.replace(/\D/g, '');
   const isPhoneValid = cleanDigits.length >= 10;
 
-  // Step 3: Password Validation
   const hasMinLength = password.length >= 8;
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const isPasswordValid = hasMinLength && hasLetter && hasNumber;
 
-  // Step 4: DOB Validation & Age Calculation
+  // DOB Validation & Age Calculation
   const calculateAge = (): { age: number | null; isValidDate: boolean } => {
     if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
       return { age: null, isValidDate: false };
@@ -112,7 +93,14 @@ export const Email = () => {
     const m = parseInt(month, 10);
     const y = parseInt(year, 10);
 
-    if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > new Date().getFullYear()) {
+    if (
+      m < 1 ||
+      m > 12 ||
+      d < 1 ||
+      d > 31 ||
+      y < 1900 ||
+      y > new Date().getFullYear()
+    ) {
       return { age: null, isValidDate: false };
     }
 
@@ -124,7 +112,10 @@ export const Email = () => {
     const today = new Date();
     let computedAge = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       computedAge--;
     }
 
@@ -132,49 +123,49 @@ export const Email = () => {
   };
 
   const { age, isValidDate } = calculateAge();
-  const isAdult = isValidDate && age !== null && age >= 18;
+  const isAdult = isValidDate && age !== null && age >= AGE.MIN;
   const isDobValid = isAdult;
 
-  // Back navigation handler (goes back step-by-step conditionally)
   const handleBack = useCallback(() => {
-    if (currentStep === 'dob') {
-      transitionToStep('password');
+    if (currentStep === SIGNUP_STEPS.DOB) {
+      transitionToStep(SIGNUP_STEPS.PASSWORD);
       return true;
     }
-    if (currentStep === 'password') {
-      transitionToStep('phone');
+    if (currentStep === SIGNUP_STEPS.PASSWORD) {
+      transitionToStep(SIGNUP_STEPS.PHONE);
       return true;
     }
-    if (currentStep === 'phone') {
-      transitionToStep('email');
+    if (currentStep === SIGNUP_STEPS.PHONE) {
+      transitionToStep(SIGNUP_STEPS.EMAIL);
       return true;
     }
-    // If on email, navigate back to SignUp screen
+
     goBack();
     return true;
   }, [currentStep]);
 
-  // Hardware back press on Android
   useEffect(() => {
     const backAction = () => {
       return handleBack();
     };
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
     return () => backHandler.remove();
   }, [handleBack]);
 
-  // Next button click handler (switches step conditionally)
   const handleNext = () => {
-    if (currentStep === 'email') {
+    if (currentStep === SIGNUP_STEPS.EMAIL) {
       if (!isEmailValid) return;
-      transitionToStep('phone');
-    } else if (currentStep === 'phone') {
+      transitionToStep(SIGNUP_STEPS.PHONE);
+    } else if (currentStep === SIGNUP_STEPS.PHONE) {
       if (!isPhoneValid) return;
-      transitionToStep('password');
-    } else if (currentStep === 'password') {
+      transitionToStep(SIGNUP_STEPS.PASSWORD);
+    } else if (currentStep === SIGNUP_STEPS.PASSWORD) {
       if (!isPasswordValid) return;
-      transitionToStep('dob');
-    } else if (currentStep === 'dob') {
+      transitionToStep(SIGNUP_STEPS.DOB);
+    } else if (currentStep === SIGNUP_STEPS.DOB) {
       if (!isDobValid) return;
       Keyboard.dismiss();
 
@@ -184,38 +175,32 @@ export const Email = () => {
         `Birthday: ${day}/${month}/${year} (Age: ${age})`,
       ].join('\n');
 
-      Alert.alert(
-        'Account Created!',
-        `Welcome to Tinder!\n\n${summary}`,
-        [
-          {
-            text: 'Get Started',
-            onPress: () => {
-              resetAndNavigate(SCREEN_NAMES.SIGNUP);
-            },
+      Alert.alert('Account Created!', `Welcome to Tinder!\n\n${summary}`, [
+        {
+          text: 'Get Started',
+          onPress: () => {
+            resetAndNavigate(SCREEN_NAMES.SIGNUP);
           },
-        ],
-      );
+        },
+      ]);
     }
   };
 
-  // Determine button enabled state for current step
   const isCurrentStepValid = () => {
     switch (currentStep) {
-      case 'email':
+      case SIGNUP_STEPS.EMAIL:
         return isEmailValid;
-      case 'phone':
+      case SIGNUP_STEPS.PHONE:
         return isPhoneValid;
-      case 'password':
+      case SIGNUP_STEPS.PASSWORD:
         return isPasswordValid;
-      case 'dob':
+      case SIGNUP_STEPS.DOB:
         return isDobValid;
       default:
         return false;
     }
   };
 
-  // DOB Handlers
   const handleDayChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
     setDay(cleaned);
@@ -261,7 +246,7 @@ export const Email = () => {
         >
           <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
             {/* STEP 1: EMAIL */}
-            {currentStep === 'email' && (
+            {currentStep === SIGNUP_STEPS.EMAIL && (
               <View>
                 <Text style={styles.title}>What's your email?</Text>
                 <UnderlineInput
@@ -275,13 +260,14 @@ export const Email = () => {
                   containerStyle={styles.inputContainer}
                 />
                 <Text style={styles.helperText}>
-                  We'll send you a code to verify your email. You may need to check your spam email folder.
+                  We'll send you a code to verify your email. You may need to
+                  check your spam email folder.
                 </Text>
               </View>
             )}
 
             {/* STEP 2: MOBILE / PHONE */}
-            {currentStep === 'phone' && (
+            {currentStep === SIGNUP_STEPS.PHONE && (
               <View>
                 <Text style={styles.title}>What's your number?</Text>
                 <View style={styles.phoneRow}>
@@ -310,7 +296,8 @@ export const Email = () => {
                 </View>
 
                 <Text style={styles.helperText}>
-                  We'll send you a code to verify your phone. Message and data rates may apply.{' '}
+                  We'll send you a code to verify your phone. Message and data
+                  rates may apply.{' '}
                   <Text style={styles.linkText} onPress={handleLinkPress}>
                     What happens if your number changes?
                   </Text>
@@ -319,7 +306,7 @@ export const Email = () => {
             )}
 
             {/* STEP 3: PASSWORD */}
-            {currentStep === 'password' && (
+            {currentStep === SIGNUP_STEPS.PASSWORD && (
               <View>
                 <Text style={styles.title}>Create a password</Text>
                 <UnderlineInput
@@ -338,7 +325,11 @@ export const Email = () => {
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
                       <AppIcon
-                        name={isSecure ? 'eye-off-outline' : 'eye-outline'}
+                        name={
+                          isSecure
+                            ? ICON_NAMES.EYE_OFF_OUTLINE
+                            : ICON_NAMES.EYE_OUTLINE
+                        }
                         size={20}
                         color={COLORS.textSubtle}
                       />
@@ -346,28 +337,43 @@ export const Email = () => {
                   }
                 />
                 <Text style={styles.helperText}>
-                  Must contain at least 8 characters, including letters and numbers. Don't share it with anyone.
+                  Must contain at least 8 characters, including letters and
+                  numbers. Don't share it with anyone.
                 </Text>
 
                 <View style={styles.passwordRequirements}>
                   <View style={styles.reqItem}>
-                    <Text style={[styles.reqCheck, hasMinLength ? styles.reqValid : styles.reqInvalid]}>
+                    <Text
+                      style={[
+                        styles.reqCheck,
+                        hasMinLength ? styles.reqValid : styles.reqInvalid,
+                      ]}
+                    >
                       {hasMinLength ? '✓' : '•'}
                     </Text>
                     <Text style={styles.reqText}>At least 8 characters</Text>
                   </View>
                   <View style={styles.reqItem}>
-                    <Text style={[styles.reqCheck, hasLetter && hasNumber ? styles.reqValid : styles.reqInvalid]}>
+                    <Text
+                      style={[
+                        styles.reqCheck,
+                        hasLetter && hasNumber
+                          ? styles.reqValid
+                          : styles.reqInvalid,
+                      ]}
+                    >
                       {hasLetter && hasNumber ? '✓' : '•'}
                     </Text>
-                    <Text style={styles.reqText}>Contains letters and numbers</Text>
+                    <Text style={styles.reqText}>
+                      Contains letters and numbers
+                    </Text>
                   </View>
                 </View>
               </View>
             )}
 
             {/* STEP 4: DOB */}
-            {currentStep === 'dob' && (
+            {currentStep === SIGNUP_STEPS.DOB && (
               <View>
                 <Text style={styles.title}>When's your birthday?</Text>
                 <View style={styles.dobContainer}>
@@ -377,7 +383,8 @@ export const Email = () => {
                       style={[
                         styles.dobInput,
                         styles.dobDay,
-                        focusedDobField === 'day' && styles.dobInputFocused,
+                        focusedDobField === DOB_FIELDS.DAY &&
+                          styles.dobInputFocused,
                       ]}
                       value={day}
                       onChangeText={handleDayChange}
@@ -385,7 +392,7 @@ export const Email = () => {
                       placeholderTextColor={COLORS.textMuted}
                       keyboardType="number-pad"
                       maxLength={2}
-                      onFocus={() => setFocusedDobField('day')}
+                      onFocus={() => setFocusedDobField(DOB_FIELDS.DAY)}
                       autoFocus
                     />
                   </View>
@@ -398,7 +405,8 @@ export const Email = () => {
                       style={[
                         styles.dobInput,
                         styles.dobMonth,
-                        focusedDobField === 'month' && styles.dobInputFocused,
+                        focusedDobField === DOB_FIELDS.MONTH &&
+                          styles.dobInputFocused,
                       ]}
                       value={month}
                       onChangeText={handleMonthChange}
@@ -411,7 +419,7 @@ export const Email = () => {
                       placeholderTextColor={COLORS.textMuted}
                       keyboardType="number-pad"
                       maxLength={2}
-                      onFocus={() => setFocusedDobField('month')}
+                      onFocus={() => setFocusedDobField(DOB_FIELDS.MONTH)}
                     />
                   </View>
 
@@ -423,7 +431,8 @@ export const Email = () => {
                       style={[
                         styles.dobInput,
                         styles.dobYear,
-                        focusedDobField === 'year' && styles.dobInputFocused,
+                        focusedDobField === DOB_FIELDS.YEAR &&
+                          styles.dobInputFocused,
                       ]}
                       value={year}
                       onChangeText={handleYearChange}
@@ -436,33 +445,39 @@ export const Email = () => {
                       placeholderTextColor={COLORS.textMuted}
                       keyboardType="number-pad"
                       maxLength={4}
-                      onFocus={() => setFocusedDobField('year')}
+                      onFocus={() => setFocusedDobField(DOB_FIELDS.YEAR)}
                     />
                   </View>
                 </View>
 
                 {isValidDate && age !== null ? (
                   <View style={styles.ageBadgeContainer}>
-                    {age >= 18 ? (
+                    {age >= AGE.MIN ? (
                       <View style={styles.ageBadge}>
-                        <Text style={styles.ageBadgeText}>Age: {age} years old</Text>
+                        <Text style={styles.ageBadgeText}>
+                          Age: {age} years old
+                        </Text>
                       </View>
                     ) : (
                       <View style={styles.ageErrorBadge}>
-                        <Text style={styles.ageErrorText}>You must be at least 18 years old to use Tinder.</Text>
+                        <Text style={styles.ageErrorText}>
+                          You must be at least ${AGE.MIN} years old to use
+                          Tinder.
+                        </Text>
                       </View>
                     )}
                   </View>
                 ) : null}
 
                 <Text style={styles.helperText}>
-                  Your age will be public, not your birthday. You must be at least 18 years old to use Tinder.
+                  Your age will be public, not your birthday. You must be at
+                  least ${AGE.MIN} years old to use Tinder.
                 </Text>
               </View>
             )}
           </Animated.View>
 
-          {/* Bottom Action Button (Common to all steps) */}
+          {/* Bottom Action Button */}
           <View style={styles.bottomContainer}>
             <Button
               title="Next"
@@ -489,7 +504,7 @@ export const Email = () => {
               <Text style={styles.modalTitle}>Select Country</Text>
               <FlatList
                 data={COUNTRIES}
-                keyExtractor={(item) => item.code + item.dialCode}
+                keyExtractor={item => item.code + item.dialCode}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.countryItem}

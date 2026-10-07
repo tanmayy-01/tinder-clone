@@ -3,9 +3,6 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
   View,
 } from 'react-native';
 import { styles } from './Button.styles';

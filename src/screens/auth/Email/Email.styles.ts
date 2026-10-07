@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS } from '@/constants';
+import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { scale } from '@/lib/size';
 
 export const styles = StyleSheet.create({
@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: scale.ms(30),
-    fontWeight: '800',
+    fontWeight: FONT_WEIGHTS.extraBold,
     color: COLORS.textDark,
     marginTop: scale.h(12),
     marginBottom: scale.h(28),
@@ -28,18 +28,17 @@ export const styles = StyleSheet.create({
     marginTop: scale.h(4),
   },
   helperText: {
-    fontSize: scale.ms(13.5),
+    fontSize: FONT_SIZES.sm,
     color: COLORS.textSubtle,
     lineHeight: scale.h(19),
     marginTop: scale.h(14),
-    fontWeight: '400',
+    fontWeight: FONT_WEIGHTS.regular,
   },
   linkText: {
     color: COLORS.linkBlue,
     textDecorationLine: 'underline',
-    fontWeight: '600',
+    fontWeight: FONT_WEIGHTS.semibold,
   },
-  // Mobile / Phone input row
   phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -56,7 +55,7 @@ export const styles = StyleSheet.create({
   },
   countryPickerText: {
     fontSize: scale.ms(17),
-    fontWeight: '600',
+    fontWeight: FONT_WEIGHTS.semibold,
     color: COLORS.textDark,
   },
   chevron: {
@@ -68,10 +67,9 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   phoneInput: {
-    fontSize: scale.ms(18),
+    fontSize: FONT_SIZES.lg,
     letterSpacing: 0.5,
   },
-  // Password eye toggle
   eyeButton: {
     padding: scale.w(4),
   },
@@ -85,11 +83,11 @@ export const styles = StyleSheet.create({
     gap: scale.w(8),
   },
   reqCheck: {
-    fontSize: scale.ms(14),
-    fontWeight: '700',
+    fontSize: FONT_SIZES.sm,
+    fontWeight: FONT_WEIGHTS.bold,
   },
   reqValid: {
-    color: '#00875A',
+    color: COLORS.reqValid,
   },
   reqInvalid: {
     color: COLORS.textMuted,
@@ -98,7 +96,6 @@ export const styles = StyleSheet.create({
     fontSize: scale.ms(13),
     color: COLORS.textSubtle,
   },
-  // DOB Segmented row
   dobContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -111,7 +108,7 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderBottomColor: COLORS.borderLine,
     fontSize: scale.ms(22),
-    fontWeight: '700',
+    fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.textDark,
     textAlign: 'center',
     paddingVertical: scale.h(6),
@@ -138,38 +135,36 @@ export const styles = StyleSheet.create({
   },
   ageBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E8F5E9',
+    backgroundColor: COLORS.ageBadge,
     paddingHorizontal: scale.w(12),
     paddingVertical: scale.h(4),
     borderRadius: scale.ms(12),
   },
   ageBadgeText: {
-    color: '#2E7D32',
+    color: COLORS.ageBadgeText,
     fontSize: scale.ms(13),
-    fontWeight: '700',
+    fontWeight: FONT_WEIGHTS.bold,
   },
   ageErrorBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: COLORS.ageErrorBadge,
     paddingHorizontal: scale.w(12),
     paddingVertical: scale.h(4),
     borderRadius: scale.ms(12),
   },
   ageErrorText: {
-    color: '#D32F2F',
+    color: COLORS.ageErrorText,
     fontSize: scale.ms(13),
-    fontWeight: '700',
+    fontWeight: FONT_WEIGHTS.bold,
   },
-  // Bottom button
   bottomContainer: {
     width: '100%',
     alignItems: 'center',
     paddingTop: scale.h(16),
   },
-  // Country Picker Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: COLORS.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -181,8 +176,8 @@ export const styles = StyleSheet.create({
     maxHeight: '60%',
   },
   modalTitle: {
-    fontSize: scale.ms(18),
-    fontWeight: '700',
+    fontSize: FONT_SIZES.lg,
+    fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.textDark,
     marginBottom: scale.h(16),
   },
@@ -194,13 +189,13 @@ export const styles = StyleSheet.create({
     borderBottomColor: COLORS.borderLine,
   },
   countryName: {
-    fontSize: scale.ms(16),
+    fontSize: FONT_SIZES.md,
     color: COLORS.textDark,
-    fontWeight: '500',
+    fontWeight: FONT_WEIGHTS.medium,
   },
   countryDial: {
-    fontSize: scale.ms(16),
+    fontSize: FONT_SIZES.md,
     color: COLORS.textSubtle,
-    fontWeight: '600',
+    fontWeight: FONT_WEIGHTS.semibold,
   },
 });

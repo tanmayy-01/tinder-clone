@@ -6,4 +6,6 @@ export const ICON_NAMES = {
   MAIL_OUTLINE: 'mail-outline',
   CHEVRON_DOWN: 'chevron-down',
   BACK_ARROW: 'arrow-back',
+  EYE_OUTLINE: 'eye-outline',
+  EYE_OFF_OUTLINE: 'eye-off-outline',
 } as const;

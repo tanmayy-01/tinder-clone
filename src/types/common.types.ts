@@ -1,4 +1,12 @@
-import { ImageProps, ImageStyle, StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import { SIGNUP_STEPS } from '@/constants';
+import {
+  ImageProps,
+  ImageStyle,
+  StyleProp,
+  TextInputProps,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 export type ButtonVariant = 'primary' | 'social' | 'outline';
 
@@ -35,4 +43,12 @@ export interface UnderlineInputProps extends TextInputProps {
 
 export interface AppImageProps extends Omit<ImageProps, 'style'> {
   style?: StyleProp<ImageStyle>;
-}   
+}
+
+export type Step = (typeof SIGNUP_STEPS)[keyof typeof SIGNUP_STEPS];
+
+export interface CountryOption {
+  code: string;
+  dialCode: string;
+  name: string;
+}

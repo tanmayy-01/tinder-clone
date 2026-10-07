@@ -13,4 +13,10 @@ export const COLORS = {
   buttonDisabledText: '#9999A0',
   linkBlue: '#2575FC',
   transparent: 'transparent',
+  reqValid: '#00875A',
+  ageBadge: '#E8F5E9',
+  ageBadgeText: '#2E7D32',
+  ageErrorBadge: '#FFEBEE',
+  ageErrorText: '#D32F2F',
+  overlay: 'rgba(0,0,0,0.5)',
 } as const;

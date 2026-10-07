@@ -4,6 +4,7 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Email: undefined;
+  UploadImage: undefined;
 };
 
 export type NavigateKey = keyof RootStackParamList;

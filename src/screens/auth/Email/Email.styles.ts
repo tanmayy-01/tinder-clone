@@ -198,4 +198,30 @@ export const styles = StyleSheet.create({
     color: COLORS.textSubtle,
     fontWeight: FONT_WEIGHTS.semibold,
   },
+  genderContainer: {
+    gap: scale.h(16),
+    marginTop: scale.h(8),
+  },
+  genderButton: {
+    height: scale.h(52),
+    borderRadius: scale.ms(26),
+    borderWidth: 1.5,
+    borderColor: COLORS.borderLightGray,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+  },
+  genderButtonSelected: {
+    borderColor: COLORS.borderFocused,
+    borderWidth: 2,
+  },
+  genderText: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: FONT_WEIGHTS.semibold,
+    color: COLORS.textMuted,
+  },
+  genderTextSelected: {
+    color: COLORS.textDark,
+    fontWeight: FONT_WEIGHTS.bold,
+  },
 });

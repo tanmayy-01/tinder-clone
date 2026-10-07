@@ -19,4 +19,9 @@ export const COLORS = {
   ageErrorBadge: '#FFEBEE',
   ageErrorText: '#D32F2F',
   overlay: 'rgba(0,0,0,0.5)',
+  borderLightGray: '#C8C8CE',
+  cardBackground: '#ECEFF1',
+  cardBorder: '#CBD5E1',
+  cardFilledBackground: '#F8FAFC',
+  cardFilledBorder: '#E2E8F0',
 } as const;

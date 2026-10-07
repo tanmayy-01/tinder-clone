@@ -21,6 +21,12 @@ export const SIGNUP_STEPS = {
   PHONE: 'phone',
   PASSWORD: 'password',
   DOB: 'dob',
+  GENDER: 'gender',
+} as const;
+
+export const GENDER_OPTIONS = {
+  WOMAN: 'Woman',
+  MAN: 'Man',
 } as const;
 
 export const DOB_FIELDS = {
@@ -32,3 +38,11 @@ export const DOB_FIELDS = {
 export const AGE = {
   MIN: 18,
 };
+
+export const TOTAL_SLOTS = 6;
+export const MIN_REQUIRED_PHOTOS = 2;
+
+export const UPLOAD_IMAGE_STEPS = {
+  IMAGES: 'images',
+  CITY: 'city',
+} as const;

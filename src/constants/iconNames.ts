@@ -8,4 +8,6 @@ export const ICON_NAMES = {
   BACK_ARROW: 'arrow-back',
   EYE_OUTLINE: 'eye-outline',
   EYE_OFF_OUTLINE: 'eye-off-outline',
+  ADD: 'add',
+  CLOSE: 'close',
 } as const;

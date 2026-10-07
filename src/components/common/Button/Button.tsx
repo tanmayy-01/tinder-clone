@@ -7,7 +7,9 @@ import {
 } from 'react-native';
 import { styles } from './Button.styles';
 import { COLORS } from '@/constants';
-import { ButtonProps } from '@/types';
+import { ButtonProps, ButtonVariant } from '@/types';
+
+export type { ButtonProps, ButtonVariant };
 
 export const Button: React.FC<ButtonProps> = ({
   title,

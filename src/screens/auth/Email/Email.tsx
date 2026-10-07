@@ -20,12 +20,14 @@ import {
   COLORS,
   COUNTRIES,
   DOB_FIELDS,
+  GENDER_OPTIONS,
   ICON_NAMES,
   SCREEN_NAMES,
   SIGNUP_STEPS,
 } from '@/constants';
-import { goBack, isIOS, isValidEmail, resetAndNavigate } from '@/utils';
+import { goBack, isIOS, isValidEmail, navigate, resetAndNavigate } from '@/utils';
 import { CountryOption, Step } from '@/types';
+import { signUpWithEmail } from '@/services';
 
 export const Email = () => {
   const [currentStep, setCurrentStep] = useState<Step>(SIGNUP_STEPS.EMAIL);
@@ -39,6 +41,8 @@ export const Email = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
+  const [gender, setGender] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   // DOB states
   const [day, setDay] = useState('');
@@ -127,6 +131,11 @@ export const Email = () => {
   const isDobValid = isAdult;
 
   const handleBack = useCallback(() => {
+    if (loading) return true;
+    if (currentStep === SIGNUP_STEPS.GENDER) {
+      transitionToStep(SIGNUP_STEPS.DOB);
+      return true;
+    }
     if (currentStep === SIGNUP_STEPS.DOB) {
       transitionToStep(SIGNUP_STEPS.PASSWORD);
       return true;
@@ -167,22 +176,57 @@ export const Email = () => {
       transitionToStep(SIGNUP_STEPS.DOB);
     } else if (currentStep === SIGNUP_STEPS.DOB) {
       if (!isDobValid) return;
-      Keyboard.dismiss();
+      transitionToStep(SIGNUP_STEPS.GENDER);
+    } else if (currentStep === SIGNUP_STEPS.GENDER) {
+      handleSignUp();
+    }
+  };
 
-      const summary = [
-        `Email: ${email.trim()}`,
-        `Mobile: ${selectedCountry.dialCode} ${cleanDigits}`,
-        `Birthday: ${day}/${month}/${year} (Age: ${age})`,
-      ].join('\n');
+  const handleSignUp = async () => {
+    if (!gender || loading) return;
+    Keyboard.dismiss();
 
-      Alert.alert('Account Created!', `Welcome to Tinder!\n\n${summary}`, [
-        {
-          text: 'Get Started',
-          onPress: () => {
-            resetAndNavigate(SCREEN_NAMES.SIGNUP);
+    try {
+      setLoading(true);
+      const fullDob = `${day}/${month}/${year}`;
+      const fullPhone = `${selectedCountry.dialCode} ${cleanDigits}`;
+      await signUpWithEmail({
+        email,
+        password,
+        phoneNumber: fullPhone,
+        dob: fullDob,
+        age,
+        gender,
+      });
+
+      
+
+      Alert.alert(
+        'Account Created!',
+        'Your profile has been created successfully.',
+        [
+          {
+            text: 'Continue',
+            onPress: () => {
+              resetAndNavigate(SCREEN_NAMES.UPLOAD_IMAGE);
+            },
           },
-        },
-      ]);
+        ],
+      );
+    } catch (error: any) {
+      let errorMessage = 'An error occurred during signup.';
+      if (error?.code === 'auth/email-already-in-use') {
+        errorMessage = 'That email address is already in use!';
+      } else if (error?.code === 'auth/invalid-email') {
+        errorMessage = 'That email address is invalid!';
+      } else if (error?.code === 'auth/weak-password') {
+        errorMessage = 'The password is too weak.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      Alert.alert('Sign Up Failed', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -196,6 +240,8 @@ export const Email = () => {
         return isPasswordValid;
       case SIGNUP_STEPS.DOB:
         return isDobValid;
+      case SIGNUP_STEPS.GENDER:
+        return !!gender;
       default:
         return false;
     }
@@ -242,7 +288,7 @@ export const Email = () => {
         <KeyboardAvoidingView
           style={styles.container}
           behavior={isIOS ? 'padding' : 'height'}
-          keyboardVerticalOffset={isIOS ? 20 : 0}
+          keyboardVerticalOffset={isIOS ? 20 : 10}
         >
           <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
             {/* STEP 1: EMAIL */}
@@ -279,7 +325,11 @@ export const Email = () => {
                     <Text style={styles.countryPickerText}>
                       {selectedCountry.code} {selectedCountry.dialCode}
                     </Text>
-                    <Text style={styles.chevron}>▼</Text>
+                    <AppIcon
+                      name={ICON_NAMES.CHEVRON_DOWN}
+                      size={16}
+                      color={COLORS.textDark}
+                    />
                   </TouchableOpacity>
 
                   <View style={styles.phoneInputContainer}>
@@ -461,7 +511,7 @@ export const Email = () => {
                     ) : (
                       <View style={styles.ageErrorBadge}>
                         <Text style={styles.ageErrorText}>
-                          You must be at least ${AGE.MIN} years old to use
+                          You must be at least {AGE.MIN} years old to use
                           Tinder.
                         </Text>
                       </View>
@@ -471,8 +521,56 @@ export const Email = () => {
 
                 <Text style={styles.helperText}>
                   Your age will be public, not your birthday. You must be at
-                  least ${AGE.MIN} years old to use Tinder.
+                  least {AGE.MIN} years old to use Tinder.
                 </Text>
+              </View>
+            )}
+
+            {/* STEP 5: GENDER */}
+            {currentStep === SIGNUP_STEPS.GENDER && (
+              <View>
+                <Text style={styles.title}>What's your gender?</Text>
+                <View style={styles.genderContainer}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={[
+                      styles.genderButton,
+                      gender === GENDER_OPTIONS.WOMAN &&
+                        styles.genderButtonSelected,
+                    ]}
+                    onPress={() => setGender(GENDER_OPTIONS.WOMAN)}
+                  >
+                    <Text
+                      style={[
+                        styles.genderText,
+                        gender === GENDER_OPTIONS.WOMAN &&
+                          styles.genderTextSelected,
+                      ]}
+                    >
+                      {GENDER_OPTIONS.WOMAN}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={[
+                      styles.genderButton,
+                      gender === GENDER_OPTIONS.MAN &&
+                        styles.genderButtonSelected,
+                    ]}
+                    onPress={() => setGender(GENDER_OPTIONS.MAN)}
+                  >
+                    <Text
+                      style={[
+                        styles.genderText,
+                        gender === GENDER_OPTIONS.MAN &&
+                          styles.genderTextSelected,
+                      ]}
+                    >
+                      {GENDER_OPTIONS.MAN}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </Animated.View>
@@ -480,9 +578,10 @@ export const Email = () => {
           {/* Bottom Action Button */}
           <View style={styles.bottomContainer}>
             <Button
-              title="Next"
+              title={currentStep === SIGNUP_STEPS.GENDER ? 'Sign Up' : 'Next'}
               variant="primary"
-              disabled={!isCurrentStepValid()}
+              disabled={!isCurrentStepValid() || loading}
+              loading={loading}
               onPress={handleNext}
             />
           </View>

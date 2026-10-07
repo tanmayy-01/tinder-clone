@@ -5,6 +5,7 @@ import SignUp from '@/screens/auth/SignUp/SignUp';
 import Login from '@/screens/auth/Login/Login';
 import Email from '@/screens/auth/Email';
 import Splash from '@/screens/splash';
+import UploadImage from '@/screens/main/UploadImage';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,11 @@ const AppNavigation: React.FC<AppNavigationProps> = ({
       <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={SignUp} />
       <Stack.Screen name={SCREEN_NAMES.LOGIN} component={Login} />
       <Stack.Screen name={SCREEN_NAMES.EMAIL} component={Email} />
+      <Stack.Screen
+        name={SCREEN_NAMES.UPLOAD_IMAGE}
+        component={UploadImage}
+        options={{ gestureEnabled: false }}
+      />
     </Stack.Navigator>
   );
 };

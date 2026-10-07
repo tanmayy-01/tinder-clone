@@ -4,6 +4,8 @@ import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '@/constants';
 import { scale } from '@/lib/size';
 import { UnderlineInputProps } from '@/types';
 
+export type { UnderlineInputProps };
+
 export const UnderlineInput: React.FC<UnderlineInputProps> = ({
   leftComponent,
   rightComponent,

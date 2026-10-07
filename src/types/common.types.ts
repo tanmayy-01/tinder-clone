@@ -1,4 +1,4 @@
-import { SIGNUP_STEPS } from '@/constants';
+import { GENDER_OPTIONS, SIGNUP_STEPS, UPLOAD_IMAGE_STEPS } from '@/constants';
 import {
   ImageProps,
   ImageStyle,
@@ -46,6 +46,9 @@ export interface AppImageProps extends Omit<ImageProps, 'style'> {
 }
 
 export type Step = (typeof SIGNUP_STEPS)[keyof typeof SIGNUP_STEPS];
+export type ImageStep = (typeof UPLOAD_IMAGE_STEPS)[keyof typeof UPLOAD_IMAGE_STEPS];
+
+export type Gender = (typeof GENDER_OPTIONS)[keyof typeof GENDER_OPTIONS];
 
 export interface CountryOption {
   code: string;

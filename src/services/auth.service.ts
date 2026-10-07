@@ -1,19 +1,15 @@
+import { SignUpData, UpdateUserData } from '@/types';
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
-import { getFirestore, doc, setDoc, serverTimestamp } from '@react-native-firebase/firestore';
-
-export interface SignUpData {
-  email: string;
-  password: string;
-  phoneNumber: string;
-  dob: string;
-  age: number | null;
-  gender: string;
-  city?: string;
-}
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 
 /**
  * Sign up a user with email and password
@@ -42,7 +38,7 @@ export const signUpWithEmail = async (data: SignUpData) => {
     dob,
     age,
     gender,
-    city: '', 
+    city: '',
     images: [],
     createdAt: serverTimestamp(),
   });
@@ -50,16 +46,14 @@ export const signUpWithEmail = async (data: SignUpData) => {
   return userCredential.user;
 };
 
-export interface UpdateUserData {
-  uid: string;
-  images: string[];
-  city: string;
-}
-
 /**
  * Update user profile with images and city.
  */
-export const updateUserProfile = async ({ uid, images, city }: UpdateUserData) => {
+export const updateUserProfile = async ({
+  uid,
+  images,
+  city,
+}: UpdateUserData) => {
   const db = getFirestore();
   const userRef = doc(db, 'users', uid);
 
@@ -74,6 +68,9 @@ export const updateUserProfile = async ({ uid, images, city }: UpdateUserData) =
   );
 };
 
+/**
+ * Get the currently authenticated user
+ */
 export const getCurrentUser = () => {
   return getAuth().currentUser;
 };
@@ -90,5 +87,3 @@ export const signInWithEmail = async (email: string, password: string) => {
   );
   return userCredential.user;
 };
-
-

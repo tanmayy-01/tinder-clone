@@ -46,3 +46,4 @@ export const UPLOAD_IMAGE_STEPS = {
   IMAGES: 'images',
   CITY: 'city',
 } as const;
+

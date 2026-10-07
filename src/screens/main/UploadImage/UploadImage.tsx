@@ -22,7 +22,7 @@ import {
   TOTAL_SLOTS,
   UPLOAD_IMAGE_STEPS,
 } from '@/constants';
-import { goBack, isIOS, resetAndNavigate } from '@/utils';
+import { isIOS, resetAndNavigate } from '@/utils';
 import { getCurrentUser, updateUserProfile } from '@/services';
 import { ImageStep } from '@/types';
 import { useNavigation } from '@react-navigation/native';

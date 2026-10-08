@@ -10,16 +10,24 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
+  FlatList,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { styles } from './Profile.styles';
 import { AppIcon } from '@/components';
 import { COLORS, ICON_NAMES, SCREEN_NAMES } from '@/constants';
-import { getCurrentUser, updateUserFullProfile, signOutUser } from '@/services';
-import { UserProfile } from '@/types';
+import {
+  getCurrentUser,
+  updateUserFullProfile,
+  signOutUser,
+  onBlockedUsersSnapshot,
+  unblockUser,
+} from '@/services';
+import { UserProfile, BlockedUserWithProfile } from '@/types';
 import { isIOS } from '@/utils';
 import { getFirestore, doc, onSnapshot } from '@react-native-firebase/firestore';
 import { useAuth } from '@/navigation/AuthProvider';
+import Loader from '@/components/common/Loader';
 
 const MAX_PHOTOS = 6;
 
@@ -38,7 +46,49 @@ export const Profile = () => {
   const [editImages, setEditImages] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Blocked Users States
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUserWithProfile[]>([]);
+  const [isBlockedModalVisible, setIsBlockedModalVisible] = useState(false);
+
   const currentUser = getCurrentUser();
+
+  // Real-time listener for blocked users
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    const unsubscribe = onBlockedUsersSnapshot(
+      currentUser.uid,
+      list => {
+        setBlockedUsers(list);
+      },
+      err => {
+        console.error('Blocked users error:', err);
+      },
+    );
+    return () => unsubscribe();
+  }, [currentUser?.uid]);
+
+  // Unblock user handler
+  const handleUnblock = (item: BlockedUserWithProfile) => {
+    const name = item.user?.name || 'this user';
+    Alert.alert(
+      `Unblock ${name}?`,
+      `They will be able to see your profile, appear in discovery, and message you again.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Unblock',
+          onPress: async () => {
+            try {
+              await unblockUser(currentUser!.uid, item.blockedUserId);
+              Alert.alert('Success', `${name} has been unblocked.`);
+            } catch (err: any) {
+              Alert.alert('Error', err?.message || 'Could not unblock user.');
+            }
+          },
+        },
+      ],
+    );
+  };
 
   // Real-time listener for current user profile
   useEffect(() => {
@@ -170,14 +220,7 @@ export const Profile = () => {
 
   if (isLoading) {
     return (
-      <View
-        style={[
-          styles.safeArea,
-          { justifyContent: 'center', alignItems: 'center' },
-        ]}
-      >
-        <ActivityIndicator size="large" color={COLORS.tinderRed} />
-      </View>
+     <Loader/>
     );
   }
 
@@ -502,6 +545,41 @@ export const Profile = () => {
               )}
             </View>
           </View>
+
+          {/* Safety & Privacy Card */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardTitleRow}>
+                <AppIcon
+                  name={ICON_NAMES.SHIELD_CHECKMARK}
+                  size={20}
+                  color={COLORS.tinderRed}
+                />
+                <Text style={styles.cardTitle}>Safety & Privacy</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.safetyRow}
+              onPress={() => setIsBlockedModalVisible(true)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.safetyRowLeft}>
+                <View style={styles.safetyIconCircle}>
+                  <AppIcon name={ICON_NAMES.BAN} size={18} color={COLORS.tinderRed} />
+                </View>
+                <View>
+                  <Text style={styles.safetyTitle}>Blocked Users</Text>
+                  <Text style={styles.safetySubtitle}>
+                    Manage people you have blocked
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.safetyBadge}>
+                <Text style={styles.safetyBadgeText}>{blockedUsers.length}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
@@ -660,6 +738,94 @@ export const Profile = () => {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* BLOCKED USERS MODAL */}
+      <Modal
+        visible={isBlockedModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsBlockedModalVisible(false)}
+      >
+        <View style={styles.blockedModalContainer}>
+          <View style={styles.blockedModalHeader}>
+            <Text style={styles.blockedModalTitle}>Blocked Users</Text>
+            <TouchableOpacity
+              style={styles.blockedModalCloseBtn}
+              onPress={() => setIsBlockedModalVisible(false)}
+            >
+              <AppIcon
+                name={ICON_NAMES.CLOSE}
+                size={22}
+                color={COLORS.textDark}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.blockedModalSubtitle}>
+            Blocked users cannot see your profile, appear in your swipe stack,
+            or message you. You can unblock them anytime.
+          </Text>
+
+          {blockedUsers.length === 0 ? (
+            <View style={styles.emptyBlockedState}>
+              <View style={styles.emptyBlockedIcon}>
+                <AppIcon
+                  name={ICON_NAMES.SHIELD_CHECKMARK}
+                  size={40}
+                  color={COLORS.textSubtle}
+                />
+              </View>
+              <Text style={styles.emptyBlockedTitle}>No Blocked Users</Text>
+              <Text style={styles.emptyBlockedDesc}>
+                Anyone you block from a conversation will appear here.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={blockedUsers}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.blockedList}
+              renderItem={({ item }) => {
+                const user = item.user;
+                const photo = user?.images?.[0];
+                return (
+                  <View style={styles.blockedItem}>
+                    {photo ? (
+                      <Image
+                        source={{ uri: photo }}
+                        style={styles.blockedAvatar}
+                      />
+                    ) : (
+                      <View style={styles.blockedAvatarPlaceholder}>
+                        <AppIcon
+                          name={ICON_NAMES.PERSON}
+                          size={24}
+                          color={COLORS.textSubtle}
+                        />
+                      </View>
+                    )}
+                    <View style={styles.blockedInfo}>
+                      <Text style={styles.blockedName}>
+                        {user?.name || 'Blocked User'}
+                        {user?.age ? `, ${user.age}` : ''}
+                      </Text>
+                      <Text style={styles.blockedDetails}>
+                        {user?.city ? `Lives in ${user.city}` : 'Blocked'}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.unblockBtn}
+                      onPress={() => handleUnblock(item)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.unblockBtnText}>Unblock</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
+            />
+          )}
+        </View>
       </Modal>
     </View>
   );

@@ -30,6 +30,7 @@ export interface UserProfile {
   age?: number | null;
   gender?: string;
   about?: string;
+  bio?: string;
   city?: string;
   images: string[];
   hobbies: string[];

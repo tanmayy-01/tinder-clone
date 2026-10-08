@@ -25,4 +25,11 @@ export const ICON_NAMES = {
   LOG_OUT: 'log-out-outline',
   SHIELD_CHECKMARK: 'shield-checkmark-outline',
   INFORMATION_CIRCLE_OUTLINE: 'information-circle-outline',
+  INFORMATION_CIRCLE: 'information-circle',
+  STAR: 'star',
+  RELOAD: 'reload',
+  FLASH: 'flash',
+  ELLIPSIS_VERTICAL: 'ellipsis-vertical',
+  SEND: 'send',
+  BAN: 'ban',
 } as const;

@@ -25,11 +25,13 @@ import {
   SCREEN_NAMES,
   SIGNUP_STEPS,
 } from '@/constants';
-import { goBack, isIOS, isValidEmail, navigate, resetAndNavigate } from '@/utils';
+import { goBack, isIOS, isValidEmail, resetAndNavigate } from '@/utils';
 import { CountryOption, Step } from '@/types';
 import { signUpWithEmail } from '@/services';
+import { useAuth } from '@/navigation/AuthProvider';
 
 export const Email = () => {
+  const { setIsOnboarding } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>(SIGNUP_STEPS.EMAIL);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
@@ -190,6 +192,7 @@ export const Email = () => {
       setLoading(true);
       const fullDob = `${day}/${month}/${year}`;
       const fullPhone = `${selectedCountry.dialCode} ${cleanDigits}`;
+      setIsOnboarding(true);
       await signUpWithEmail({
         email,
         password,
@@ -198,22 +201,9 @@ export const Email = () => {
         age,
         gender,
       });
-
-      
-
-      Alert.alert(
-        'Account Created!',
-        'Your profile has been created successfully.',
-        [
-          {
-            text: 'Continue',
-            onPress: () => {
-              resetAndNavigate(SCREEN_NAMES.UPLOAD_IMAGE);
-            },
-          },
-        ],
-      );
+      resetAndNavigate(SCREEN_NAMES.UPLOAD_IMAGE);
     } catch (error: any) {
+      setIsOnboarding(false);
       let errorMessage = 'An error occurred during signup.';
       if (error?.code === 'auth/email-already-in-use') {
         errorMessage = 'That email address is already in use!';

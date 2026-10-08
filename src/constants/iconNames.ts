@@ -17,4 +17,12 @@ export const ICON_NAMES = {
   CHAT_BUBBLE_OUTLINE: 'chatbubble-outline',
   HEART: 'heart',
   HEART_OUTLINE: 'heart-outline',
+  SETTINGS: 'settings-outline',
+  PENCIL: 'pencil',
+  CAMERA: 'camera-outline',
+  LOCATION: 'location-outline',
+  CHECKMARK_CIRCLE: 'checkmark-circle',
+  LOG_OUT: 'log-out-outline',
+  SHIELD_CHECKMARK: 'shield-checkmark-outline',
+  INFORMATION_CIRCLE_OUTLINE: 'information-circle-outline',
 } as const;

@@ -1,4 +1,4 @@
-import { SignUpData, UpdateUserData } from '@/types';
+import { SignUpData, UpdateUserData, UserProfile } from '@/types';
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -40,6 +40,7 @@ export const signUpWithEmail = async (data: SignUpData) => {
     gender,
     city: '',
     images: [],
+    profileCompleted: false,
     createdAt: serverTimestamp(),
   });
 
@@ -52,16 +53,25 @@ export const signUpWithEmail = async (data: SignUpData) => {
 export const updateUserProfile = async ({
   uid,
   images,
-  city,
+  city ='',
+  name,
+  about,
+  hobbies,
 }: UpdateUserData) => {
   const db = getFirestore();
   const userRef = doc(db, 'users', uid);
+
+  const finalBio = (about || '').trim();
 
   await setDoc(
     userRef,
     {
       images,
       city: city.trim(),
+      ...(name && name.trim() ? { name: name.trim() } : {}),
+      ...(finalBio ? { about: finalBio, bio: finalBio } : {}),
+      ...(hobbies && hobbies.length > 0 ? { hobbies } : {}),
+      profileCompleted: true,
       updatedAt: serverTimestamp(),
     },
     { merge: true },
@@ -87,3 +97,32 @@ export const signInWithEmail = async (email: string, password: string) => {
   );
   return userCredential.user;
 };
+
+/**
+ * Update full user profile details (name, phone, about, age, city, images, etc.)
+ */
+export const updateUserFullProfile = async (
+  uid: string,
+  profileData: Record<string, any>,
+) => {
+  const db = getFirestore();
+  const userRef = doc(db, 'users', uid);
+
+  await setDoc(
+    userRef,
+    {
+      ...profileData,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+};
+
+/**
+ * Sign out the currently authenticated user
+ */
+export const signOutUser = async () => {
+  const auth = getAuth();
+  await auth.signOut();
+};
+

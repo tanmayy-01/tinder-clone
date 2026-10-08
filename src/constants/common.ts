@@ -45,5 +45,29 @@ export const MIN_REQUIRED_PHOTOS = 2;
 export const UPLOAD_IMAGE_STEPS = {
   IMAGES: 'images',
   CITY: 'city',
+  NAME: 'name',
+  BIO: 'bio',
+  HOBBIES: 'hobbies',
 } as const;
+
+export const POPULAR_HOBBIES = [
+  '🎵 Music',
+  '✈️ Travel',
+  '☕ Coffee',
+  '🏋️ Fitness',
+  '🎮 Gaming',
+  '🍕 Foodie',
+  '📚 Reading',
+  '🐶 Pets',
+  '🎬 Movies',
+  '🎨 Art',
+  '📷 Photography',
+  '🧘 Yoga',
+  '⚽ Sports',
+  '🏕️ Camping',
+  '🍳 Cooking',
+  '🏊 Swimming',
+  '🍷 Wine',
+  '💃 Dancing',
+] as const;
 

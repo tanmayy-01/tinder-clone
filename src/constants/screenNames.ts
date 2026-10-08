@@ -6,6 +6,7 @@ export const SCREEN_NAMES = {
   EMAIL: 'Email',
 
   // Main Screens
+  MAIN: 'Main',
   UPLOAD_IMAGE: 'UploadImage',
 
   // Bottom Tabs

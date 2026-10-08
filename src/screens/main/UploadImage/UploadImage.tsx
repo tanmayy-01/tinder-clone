@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { styles } from './UploadImage.styles';
@@ -18,6 +20,7 @@ import {
   COLORS,
   ICON_NAMES,
   MIN_REQUIRED_PHOTOS,
+  POPULAR_HOBBIES,
   SCREEN_NAMES,
   TOTAL_SLOTS,
   UPLOAD_IMAGE_STEPS,
@@ -26,12 +29,19 @@ import { isIOS, resetAndNavigate } from '@/utils';
 import { getCurrentUser, updateUserProfile } from '@/services';
 import { ImageStep } from '@/types';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '@/navigation/AuthProvider';
+
+const MAX_HOBBIES = 5;
 
 export const UploadImage = () => {
   const navigation = useNavigation();
+  const { setIsOnboarding } = useAuth();
   const [step, setStep] = useState<ImageStep>(UPLOAD_IMAGE_STEPS.IMAGES);
   const [images, setImages] = useState<string[]>(Array(TOTAL_SLOTS).fill(''));
   const [city, setCity] = useState('');
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+  const [selectedHobbies, setSelectedHobbies] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const isNavigatingAway = useRef(false);
@@ -39,6 +49,26 @@ export const UploadImage = () => {
   const selectedCount = images.filter(img => Boolean(img)).length;
   const isImageStepValid = selectedCount >= MIN_REQUIRED_PHOTOS;
   const isCityStepValid = city.trim().length > 0;
+  const isNameStepValid = name.trim().length >= 2;
+  const isBioStepValid = bio.trim().length >= 3;
+  const isHobbiesStepValid = selectedHobbies.length >= 1;
+
+  const isCurrentStepValid = () => {
+    switch (step) {
+      case UPLOAD_IMAGE_STEPS.IMAGES:
+        return isImageStepValid;
+      case UPLOAD_IMAGE_STEPS.CITY:
+        return isCityStepValid;
+      case UPLOAD_IMAGE_STEPS.NAME:
+        return isNameStepValid;
+      case UPLOAD_IMAGE_STEPS.BIO:
+        return isBioStepValid;
+      case UPLOAD_IMAGE_STEPS.HOBBIES:
+        return isHobbiesStepValid;
+      default:
+        return false;
+    }
+  };
 
   const transitionToStep = (nextStep: ImageStep) => {
     Keyboard.dismiss();
@@ -59,10 +89,23 @@ export const UploadImage = () => {
 
   const handleBack = useCallback(() => {
     if (isSaving) return true;
+    if (step === UPLOAD_IMAGE_STEPS.HOBBIES) {
+      transitionToStep(UPLOAD_IMAGE_STEPS.BIO);
+      return true;
+    }
+    if (step === UPLOAD_IMAGE_STEPS.BIO) {
+      transitionToStep(UPLOAD_IMAGE_STEPS.NAME);
+      return true;
+    }
+    if (step === UPLOAD_IMAGE_STEPS.NAME) {
+      transitionToStep(UPLOAD_IMAGE_STEPS.CITY);
+      return true;
+    }
     if (step === UPLOAD_IMAGE_STEPS.CITY) {
       transitionToStep(UPLOAD_IMAGE_STEPS.IMAGES);
       return true;
     }
+    // IMAGES step: back disabled!
     return true;
   }, [step, isSaving]);
 
@@ -81,7 +124,13 @@ export const UploadImage = () => {
         return;
       }
       e.preventDefault();
-      if (step === UPLOAD_IMAGE_STEPS.CITY) {
+      if (step === UPLOAD_IMAGE_STEPS.HOBBIES) {
+        transitionToStep(UPLOAD_IMAGE_STEPS.BIO);
+      } else if (step === UPLOAD_IMAGE_STEPS.BIO) {
+        transitionToStep(UPLOAD_IMAGE_STEPS.NAME);
+      } else if (step === UPLOAD_IMAGE_STEPS.NAME) {
+        transitionToStep(UPLOAD_IMAGE_STEPS.CITY);
+      } else if (step === UPLOAD_IMAGE_STEPS.CITY) {
         transitionToStep(UPLOAD_IMAGE_STEPS.IMAGES);
       }
     });
@@ -139,17 +188,38 @@ export const UploadImage = () => {
     }
   };
 
+  const handleToggleHobby = (hobby: string) => {
+    if (selectedHobbies.includes(hobby)) {
+      setSelectedHobbies(prev => prev.filter(h => h !== hobby));
+    } else {
+      if (selectedHobbies.length >= MAX_HOBBIES) {
+        Alert.alert('Limit Reached', `You can select up to ${MAX_HOBBIES} passions.`);
+        return;
+      }
+      setSelectedHobbies(prev => [...prev, hobby]);
+    }
+  };
+
   const handleNext = () => {
     if (step === UPLOAD_IMAGE_STEPS.IMAGES) {
       if (!isImageStepValid) return;
       transitionToStep(UPLOAD_IMAGE_STEPS.CITY);
-    } else {
+    } else if (step === UPLOAD_IMAGE_STEPS.CITY) {
+      if (!isCityStepValid) return;
+      transitionToStep(UPLOAD_IMAGE_STEPS.NAME);
+    } else if (step === UPLOAD_IMAGE_STEPS.NAME) {
+      if (!isNameStepValid) return;
+      transitionToStep(UPLOAD_IMAGE_STEPS.BIO);
+    } else if (step === UPLOAD_IMAGE_STEPS.BIO) {
+      if (!isBioStepValid) return;
+      transitionToStep(UPLOAD_IMAGE_STEPS.HOBBIES);
+    } else if (step === UPLOAD_IMAGE_STEPS.HOBBIES) {
       handleSave();
     }
   };
 
   const handleSave = async () => {
-    if (!isCityStepValid || isSaving) return;
+    if (!isHobbiesStepValid || isSaving) return;
 
     const user = getCurrentUser();
     const uid = user?.uid;
@@ -171,21 +241,15 @@ export const UploadImage = () => {
         uid,
         images: validImages,
         city: city.trim(),
+        name: name.trim(),
+        bio: bio.trim(),
+        about: bio.trim(),
+        hobbies: selectedHobbies,
       });
 
-      Alert.alert(
-        'Profile Completed!',
-        'Your photos and city have been updated.',
-        [
-          {
-            text: 'Go to Login',
-            onPress: () => {
-              isNavigatingAway.current = true;
-              resetAndNavigate(SCREEN_NAMES.LOGIN);
-            },
-          },
-        ],
-      );
+      setIsOnboarding(false);
+      isNavigatingAway.current = true;
+      resetAndNavigate(SCREEN_NAMES.MAIN);
     } catch (error: any) {
       Alert.alert('Update Failed', error?.message || 'Could not save profile.');
     } finally {
@@ -208,7 +272,7 @@ export const UploadImage = () => {
         >
           <View style={styles.container}>
             <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-              {step === UPLOAD_IMAGE_STEPS.IMAGES ? (
+              {step === UPLOAD_IMAGE_STEPS.IMAGES && (
                 <View>
                   <Text style={styles.title}>Add your recent pics</Text>
 
@@ -270,8 +334,10 @@ export const UploadImage = () => {
                     </View>
                   </View>
                 </View>
-              ) : (
-                /* Step 2: City Step */
+              )}
+
+              {/* Step 2: City Step */}
+              {step === UPLOAD_IMAGE_STEPS.CITY && (
                 <View>
                   <Text style={styles.title}>What's your city?</Text>
                   <UnderlineInput
@@ -288,18 +354,111 @@ export const UploadImage = () => {
                   </Text>
                 </View>
               )}
+
+              {/* Step 3: Name Step */}
+              {step === UPLOAD_IMAGE_STEPS.NAME && (
+                <View>
+                  <Text style={styles.title}>My first name is</Text>
+                  <UnderlineInput
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Enter your name"
+                    autoCapitalize="words"
+                    autoFocus
+                    containerStyle={styles.nameInputContainer}
+                  />
+                  <Text style={styles.helperText}>
+                    This is how it will appear on your Tinder profile. Be yourself!
+                  </Text>
+                </View>
+              )}
+
+              {/* Step 4: Bio Step */}
+              {step === UPLOAD_IMAGE_STEPS.BIO && (
+                <View>
+                  <Text style={styles.title}>About me</Text>
+                  <Text style={styles.subtitle}>
+                    Write a short bio to introduce yourself to your potential matches.
+                  </Text>
+                  <View style={styles.bioInputContainer}>
+                    <TextInput
+                      style={styles.bioInput}
+                      value={bio}
+                      onChangeText={setBio}
+                      placeholder="Tell others what you love, what you're looking for, or a fun fact about you..."
+                      placeholderTextColor={COLORS.textSubtle}
+                      multiline
+                      numberOfLines={4}
+                      maxLength={300}
+                      autoFocus
+                    />
+                    <View style={styles.bioFooter}>
+                      <Text style={styles.charCount}>{bio.length} / 300</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+
+              {/* Step 5: Hobbies Step */}
+              {step === UPLOAD_IMAGE_STEPS.HOBBIES && (
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.title}>What are your passions?</Text>
+                  <Text style={styles.subtitle}>
+                    Select up to 5 passions to help matches discover what you have in common.
+                  </Text>
+                  <View style={styles.hobbiesHeaderRow}>
+                    <Text style={styles.helperText}>Tap to select</Text>
+                    <View style={styles.hobbiesCountBadge}>
+                      <Text style={styles.hobbiesCountText}>
+                        {selectedHobbies.length} / {MAX_HOBBIES} selected
+                      </Text>
+                    </View>
+                  </View>
+
+                  <ScrollView
+                    style={styles.stepScroll}
+                    contentContainerStyle={styles.stepScrollContent}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    <View style={styles.chipsContainer}>
+                      {POPULAR_HOBBIES.map((hobby) => {
+                        const isSelected = selectedHobbies.includes(hobby);
+                        return (
+                          <TouchableOpacity
+                            key={hobby}
+                            activeOpacity={0.75}
+                            style={[
+                              styles.chip,
+                              isSelected && styles.chipSelected,
+                            ]}
+                            onPress={() => handleToggleHobby(hobby)}
+                          >
+                            <Text
+                              style={[
+                                styles.chipText,
+                                isSelected && styles.chipTextSelected,
+                              ]}
+                            >
+                              {hobby}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </ScrollView>
+                </View>
+              )}
             </Animated.View>
 
             {/* Bottom Button */}
             <View style={styles.bottomContainer}>
               <Button
-                title={step === UPLOAD_IMAGE_STEPS.IMAGES ? 'Next' : 'Save'}
-                variant="primary"
-                disabled={
-                  step === UPLOAD_IMAGE_STEPS.IMAGES
-                    ? !isImageStepValid
-                    : !isCityStepValid || isSaving
+                title={
+                  step === UPLOAD_IMAGE_STEPS.HOBBIES ? 'Save' : 'Next'
                 }
+                variant="primary"
+                disabled={!isCurrentStepValid() || isSaving}
                 loading={isSaving}
                 onPress={handleNext}
               />

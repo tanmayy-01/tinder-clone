@@ -33,15 +33,6 @@ export const Login = () => {
     try {
       setLoading(true);
       await signInWithEmail(email, password);
-
-      Alert.alert('Welcome Back!', 'You have logged in successfully.', [
-        {
-          text: 'Continue',
-          onPress: () => {
-            resetAndNavigate(SCREEN_NAMES.SIGNUP);
-          },
-        },
-      ]);
     } catch (error: any) {
       let message = 'An error occurred while logging in.';
       if (error?.code === 'auth/invalid-email') {

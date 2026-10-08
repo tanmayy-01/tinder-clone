@@ -5,6 +5,10 @@ export type RootStackParamList = {
   SignUp: undefined;
   Email: undefined;
   UploadImage: undefined;
+  Main: undefined;
+  Swipe: undefined;
+  Chat: undefined;
+  Profile: undefined;
 };
 
 export type NavigateKey = keyof RootStackParamList;

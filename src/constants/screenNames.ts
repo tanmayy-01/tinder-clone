@@ -9,7 +9,7 @@ export const SCREEN_NAMES = {
   UPLOAD_IMAGE: 'UploadImage',
 
   // Bottom Tabs
-  SWIP: 'Swip',
+  SWIPE: 'Swipe',
   CHAT: 'Chat',
   PROFILE: 'Profile',
 } as const;

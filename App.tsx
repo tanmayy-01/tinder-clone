@@ -1,7 +1,6 @@
 import { THEME } from '@/constants';
 import AppNavigation from '@/navigation/AppNavigation';
-import { navigationRef } from '@/utils';
-import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider } from '@/navigation/AuthProvider';
 import { StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,15 +10,16 @@ function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle={isDarkMode ? THEME.LIGHT_CONTENT : THEME.DARK_CONTENT} />
-        <NavigationContainer ref={navigationRef}>
+        <StatusBar
+          barStyle={isDarkMode ? THEME.LIGHT_CONTENT : THEME.DARK_CONTENT}
+        />
+        <AuthProvider>
           <AppNavigation />
-        </NavigationContainer>
+        </AuthProvider>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

@@ -11,4 +11,10 @@ export const ICON_NAMES = {
   LOCK_CLOSED_OUTLINE: 'lock-closed-outline',
   ADD: 'add',
   CLOSE: 'close',
+  PERSON: 'person',
+  PERSON_OUTLINE: 'person-outline',
+  CHAT_BUBBLE: 'chatbubble',
+  CHAT_BUBBLE_OUTLINE: 'chatbubble-outline',
+  HEART: 'heart',
+  HEART_OUTLINE: 'heart-outline',
 } as const;

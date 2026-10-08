@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const Swip = () => {
+const Swipe = () => {
   return (
     <View>
-      <Text>Swip</Text>
+      <Text>Swipe</Text>
     </View>
   )
 }
 
-export default Swip
+export default Swipe

@@ -1,41 +1,23 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SCREEN_NAMES } from '@/constants';
-import SignUp from '@/screens/auth/SignUp/SignUp';
-import Login from '@/screens/auth/Login/Login';
-import Email from '@/screens/auth/Email';
+import { NavigationContainer } from '@react-navigation/native';
 import Splash from '@/screens/splash';
-import UploadImage from '@/screens/main/UploadImage';
 
+import TabStack from './TabStack';
+import { useAuth } from './AuthProvider';
+import { navigationRef } from '@/utils';
+import AuthStack from './AuthStack';
 
-const Stack = createNativeStackNavigator();
+const AppNavigation = () => {
+  const { user, isInitializing } = useAuth();
 
-interface AppNavigationProps {
-  initialRoute?: typeof SCREEN_NAMES[keyof typeof SCREEN_NAMES];
-}
+  if (isInitializing) {
+    return <Splash />;
+  }
 
-const AppNavigation: React.FC<AppNavigationProps> = ({
-  initialRoute = SCREEN_NAMES.SPLASH,
-}) => {
   return (
-    <Stack.Navigator
-      key={initialRoute}
-      initialRouteName={initialRoute}
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    >
-      <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
-      <Stack.Screen name={SCREEN_NAMES.SIGNUP} component={SignUp} />
-      <Stack.Screen name={SCREEN_NAMES.LOGIN} component={Login} />
-      <Stack.Screen name={SCREEN_NAMES.EMAIL} component={Email} />
-      <Stack.Screen
-        name={SCREEN_NAMES.UPLOAD_IMAGE}
-        component={UploadImage}
-        options={{ gestureEnabled: false }}
-      />
-    </Stack.Navigator>
+    <NavigationContainer ref={navigationRef}>
+      {user ? <TabStack /> : <AuthStack />}
+    </NavigationContainer>
   );
 };
 

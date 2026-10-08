@@ -17,7 +17,7 @@ import { AppIcon } from '@/components';
 import { COLORS, ICON_NAMES, SCREEN_NAMES } from '@/constants';
 import { getCurrentUser, updateUserFullProfile, signOutUser } from '@/services';
 import { UserProfile } from '@/types';
-import { isIOS, resetAndNavigate } from '@/utils';
+import { isIOS } from '@/utils';
 import { getFirestore, doc, onSnapshot } from '@react-native-firebase/firestore';
 import { useAuth } from '@/navigation/AuthProvider';
 
@@ -160,7 +160,6 @@ export const Profile = () => {
           try {
             setIsOnboarding(false);
             await signOutUser();
-            resetAndNavigate(SCREEN_NAMES.SIGNUP);
           } catch (err: any) {
             Alert.alert('Error', err?.message || 'Could not log out.');
           }

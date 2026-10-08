@@ -12,7 +12,7 @@ import {
 import { styles } from './Login.styles';
 import { AppImage, Button, AppIcon, MailIcon } from '@/components';
 import { COLORS, ICON_NAMES, IMAGES, SCREEN_NAMES } from '@/constants';
-import { goBack, isIOS, isValidEmail, navigate, resetAndNavigate } from '@/utils';
+import { goBack, isIOS, isValidEmail, navigate } from '@/utils';
 import { signInWithEmail } from '@/services';
 import { scale } from '@/lib/size';
 import { useAuth } from '@/navigation/AuthProvider';
@@ -36,7 +36,6 @@ export const Login = () => {
       setLoading(true);
       setIsOnboarding(false);
       await signInWithEmail(email, password);
-      resetAndNavigate(SCREEN_NAMES.MAIN);
     } catch (error: any) {
       let message = 'An error occurred while logging in.';
       if (error?.code === 'auth/invalid-email') {

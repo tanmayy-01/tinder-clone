@@ -25,7 +25,7 @@ import {
   SCREEN_NAMES,
   SIGNUP_STEPS,
 } from '@/constants';
-import { goBack, isIOS, isValidEmail, resetAndNavigate } from '@/utils';
+import { goBack, isIOS, isValidEmail } from '@/utils';
 import { CountryOption, Step } from '@/types';
 import { signUpWithEmail } from '@/services';
 import { useAuth } from '@/navigation/AuthProvider';
@@ -201,7 +201,6 @@ export const Email = () => {
         age,
         gender,
       });
-      resetAndNavigate(SCREEN_NAMES.UPLOAD_IMAGE);
     } catch (error: any) {
       setIsOnboarding(false);
       let errorMessage = 'An error occurred during signup.';
